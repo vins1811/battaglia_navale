@@ -1,0 +1,31 @@
+version: '1.0'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8081:8000"  # Mappa il container backend sulla porta 8081 del PC host
+    volumes:
+      - ./backend:/app
+    environment:
+      - ENV=production
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+
+  frontend:
+    build:
+      context: ./battaglia_navale
+      dockerfile: Dockerfile  # Il Dockerfile per il frontend si trova nella directory principale
+    ports:
+      - "8082:3000"  # Mappa il container frontend sulla porta 8082 del PC host
+    # Il volume è stato rimosso per evitare di sovrascrivere la build di produzione
+    env_file:
+      - battaglia_navale/.env
+    environment:
+      - NODE_ENV=production
+    command: npm start  # Comando per avviare il frontend Next.js
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
